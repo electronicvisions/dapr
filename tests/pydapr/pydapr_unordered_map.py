@@ -13,7 +13,7 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         self.assertEqual(dummy_map.size(), 0)
         self.assertFalse(dummy_map.contains(0))
 
-        dummy_map.add(0, dummy)
+        dummy_map.set(0, dummy)
 
         self.assertFalse(dummy_map.empty())
         self.assertEqual(dummy_map.size(), 1)
@@ -39,9 +39,6 @@ class UnorderedMapTestPydapr(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             dummy_map.get(3)
-
-        with self.assertRaises(IndexError):
-            dummy_map.set(3, dummy)
 
 
 if __name__ == "__main__":

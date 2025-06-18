@@ -6,30 +6,6 @@
 namespace dapr {
 
 template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::add(Key const& key, Value const& value)
-{
-	if (m_values.contains(key)) {
-		std::stringstream ss;
-		ss << "UnorderedMap already contains entry for key " << key
-		   << ". Use set(key, value) instead.";
-		throw std::invalid_argument(ss.str());
-	}
-	m_values.emplace(key, value);
-}
-
-template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::add(Key const& key, Value&& value)
-{
-	if (m_values.contains(key)) {
-		std::stringstream ss;
-		ss << "UnorderedMap already contains entry for key " << key
-		   << ". Use set(key, value) instead.";
-		throw std::invalid_argument(ss.str());
-	}
-	m_values.emplace(key, std::move(value));
-}
-
-template <typename Key, typename Value>
 Value const& UnorderedMap<Key, Value>::get(Key const& key) const
 {
 	if (!m_values.contains(key)) {
@@ -44,22 +20,20 @@ template <typename Key, typename Value>
 void UnorderedMap<Key, Value>::set(Key const& key, Value const& value)
 {
 	if (!m_values.contains(key)) {
-		std::stringstream ss;
-		ss << "UnorderedMap doesn't contain entry for key " << key << ".";
-		throw std::out_of_range(ss.str());
+		m_values.emplace(key, value);
+	} else {
+		m_values.at(key) = value;
 	}
-	m_values.at(key) = value;
 }
 
 template <typename Key, typename Value>
 void UnorderedMap<Key, Value>::set(Key const& key, Value&& value)
 {
 	if (!m_values.contains(key)) {
-		std::stringstream ss;
-		ss << "UnorderedMap doesn't contain entry for key " << key << ".";
-		throw std::out_of_range(ss.str());
+		m_values.emplace(key, std::move(value));
+	} else {
+		m_values.at(key) = std::move(value);
 	}
-	m_values.at(key) = std::move(value);
 }
 
 template <typename Key, typename Value>

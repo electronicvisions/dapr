@@ -53,7 +53,7 @@ TEST(UnorderedMap, General)
 	EXPECT_EQ(map.size(), 0);
 	EXPECT_FALSE(map.contains(0));
 
-	map.add(0, dummy);
+	map.set(0, dummy);
 
 	EXPECT_FALSE(map.empty());
 	EXPECT_EQ(map.size(), 1);
@@ -61,7 +61,7 @@ TEST(UnorderedMap, General)
 	EXPECT_EQ(map.get(0), dummy);
 
 	auto dummy_to_move = dummy;
-	map.add(1, std::move(dummy_to_move));
+	map.set(1, std::move(dummy_to_move));
 
 	EXPECT_EQ(map.size(), 2);
 	EXPECT_TRUE(map.contains(1));
@@ -98,5 +98,4 @@ TEST(UnorderedMap, General)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(3), std::out_of_range);
-	EXPECT_THROW(map.set(3, dummy), std::out_of_range);
 }
