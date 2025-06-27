@@ -1,4 +1,5 @@
 #pragma once
+#include "dapr/property_holder.h"
 #include <stdexcept>
 #include <utility>
 
@@ -10,11 +11,24 @@ struct UnorderedMapTransform
 	template <typename U>
 	constexpr std::pair<Key const&, Value const&> operator()(U&& value) const
 	{
-		if (!value.second) {
-			throw std::logic_error("Unexpected access to moved-from object.");
+		if constexpr (std::is_same_v<
+		                  std::remove_const_t<typename std::decay_t<U>::first_type>,
+		                  PropertyHolder<Key>>) {
+			if constexpr (std::is_same_v<
+			                  typename std::decay_t<U>::second_type, PropertyHolder<Value>>) {
+				return std::pair<Key const&, Value const&>{*value.first, *value.second};
+			} else {
+				return std::pair<Key const&, Value const&>{*value.first, value.second};
+			}
+		} else {
+			if constexpr (std::is_same_v<
+			                  typename std::decay_t<U>::second_type, PropertyHolder<Value>>) {
+				return std::pair<Key const&, Value const&>{value.first, *value.second};
+			} else {
+				return std::pair<Key const&, Value const&>{value.first, value.second};
+			}
 		}
-		return std::pair<Key const&, Value const&>{value.first, *value.second};
 	}
 };
 
-} // namespace dapr
+} // namespace dapr::detail

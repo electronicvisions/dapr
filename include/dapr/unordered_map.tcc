@@ -1,6 +1,5 @@
 #pragma once
 #include "dapr/unordered_map.h"
-#include <cassert>
 #include <sstream>
 
 namespace dapr {
@@ -13,7 +12,11 @@ Value const& UnorderedMap<Key, Value>::get(Key const& key) const
 		ss << "UnorderedMap doesn't contain entry for key " << key << ".";
 		throw std::out_of_range(ss.str());
 	}
-	return *m_values.at(key);
+	if constexpr (std::is_base_of_v<Property<Value>, Value>) {
+		return *m_values.at(key);
+	} else {
+		return m_values.at(key);
+	}
 }
 
 template <typename Key, typename Value>

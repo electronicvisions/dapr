@@ -13,6 +13,13 @@ namespace pydapr GENPYBIND_TAG_PYDAPR {
 struct GENPYBIND(visible) DummyUnorderedMapParent
 {
 	typedef dapr::UnorderedMap<int, DummyProperty> PolymorphicValue GENPYBIND(opaque(false));
+
+	typedef dapr::UnorderedMap<DummyProperty, int> PolymorphicKey GENPYBIND(opaque(false));
+
+	typedef dapr::UnorderedMap<DummyProperty, DummyProperty> PolymorphicKeyValue
+	    GENPYBIND(opaque(false));
+
+	typedef dapr::UnorderedMap<int, int> NotPolymorphic GENPYBIND(opaque(false));
 };
 
 } // namespace pydapr

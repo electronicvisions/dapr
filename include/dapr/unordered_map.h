@@ -1,24 +1,36 @@
 #pragma once
 #include "dapr/detail/unordered_map_transform.h"
 #include "dapr/genpybind.h"
+#include "dapr/hashable.h"
 #include "dapr/property.h"
 #include "dapr/property_holder.h"
+#include <functional>
 #include <map>
+#include <optional>
+#include <unordered_map>
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace dapr {
 
 /**
- * UnorderedMap storing potentially polymorphic values.
- * @tparam KeyT Key type
- * @tparam ValueT Value type required to be derived from a Property
+ * UnorderedMap storing potentially polymorphic keys and/or values.
+ * The underlying map implementation is an unordered map.
+ * @tparam KeyT Key type, which if polymorphic is required to be derived from a Property and
+ * Hashable
+ * @tparam ValueT Value type, which if polymorphic is required to be derived from a Property
  */
 template <typename KeyT, typename ValueT>
 struct GENPYBIND(visible) UnorderedMap
 {
 	typedef KeyT Key;
 	typedef ValueT Value;
-	typedef std::map<Key, PropertyHolder<Value>> Backend;
+	typedef std::unordered_map<
+	    std::conditional_t<
+	        std::is_base_of_v<Property<Key>, Key> && std::is_base_of_v<Hashable, Key>,
+	        PropertyHolder<Key>,
+	        Key>,
+	    std::conditional_t<std::is_base_of_v<Property<Value>, Value>, PropertyHolder<Value>, Value>>
+	    Backend;
 
 	UnorderedMap() = default;
 
@@ -94,7 +106,6 @@ struct GENPYBIND(visible) UnorderedMap
 	bool operator!=(UnorderedMap const& other) const = default;
 
 private:
-	static_assert(std::is_base_of_v<Property<Value>, Value>);
 	Backend m_values;
 };
 

@@ -17,6 +17,11 @@ std::unique_ptr<DummyProperty> DerivedDummyProperty::move()
 	return std::make_unique<DerivedDummyProperty>(std::move(*this));
 }
 
+size_t DerivedDummyProperty::hash() const
+{
+	return value;
+}
+
 std::ostream& DerivedDummyProperty::print(std::ostream& os) const
 {
 	return os << "DerivedDummyProperty(" << value << ")";

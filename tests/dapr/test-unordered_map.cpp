@@ -1,13 +1,15 @@
 #include "dapr/unordered_map.h"
 
+#include "dapr/hashable.h"
 #include "dapr/property.h"
 #include <memory>
 #include <gtest/gtest.h>
 
-
 namespace {
 
-struct DummyProperty : public dapr::Property<DummyProperty>
+struct DummyProperty
+    : public dapr::Property<DummyProperty>
+    , dapr::Hashable
 {
 	virtual ~DummyProperty() {}
 };
@@ -15,8 +17,9 @@ struct DummyProperty : public dapr::Property<DummyProperty>
 
 struct DerivedDummyProperty : public DummyProperty
 {
-	int value;
+	int value{};
 
+	DerivedDummyProperty() = default;
 	DerivedDummyProperty(int value) : value(value) {}
 
 	virtual std::unique_ptr<DummyProperty> copy() const override
@@ -38,12 +41,30 @@ struct DerivedDummyProperty : public DummyProperty
 	{
 		return os << "DerivedDummyProperty(" << value << ")";
 	}
+
+	virtual size_t hash() const override
+	{
+		return value;
+	}
 };
 
 } // namespace
 
+namespace std {
 
-TEST(UnorderedMap, General)
+template <>
+struct hash<DerivedDummyProperty>
+{
+	size_t operator()(DerivedDummyProperty const& value) const
+	{
+		return value.hash();
+	}
+};
+
+} // namespace std
+
+
+TEST(UnorderedMap, PolymorphicValue)
 {
 	DerivedDummyProperty const dummy(5);
 
@@ -98,4 +119,133 @@ TEST(UnorderedMap, General)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(3), std::out_of_range);
+}
+
+TEST(UnorderedMap, PolymorphicKey)
+{
+	DerivedDummyProperty const dummy(5);
+
+	dapr::UnorderedMap<DummyProperty, int> map;
+
+	EXPECT_TRUE(map.empty());
+	EXPECT_EQ(map.size(), 0);
+	EXPECT_FALSE(map.contains(dummy));
+
+	map.set(dummy, 0);
+
+	EXPECT_FALSE(map.empty());
+	EXPECT_EQ(map.size(), 1);
+	EXPECT_TRUE(map.contains(dummy));
+	EXPECT_EQ(map.get(dummy), 0);
+
+	auto dummy_copy = dummy;
+	dummy_copy.value = 7;
+	map.set(dummy_copy, 1);
+
+	EXPECT_EQ(map.get(dummy_copy), 1);
+
+	map.erase(dummy_copy);
+	EXPECT_FALSE(map.contains(dummy_copy));
+	EXPECT_EQ(map.size(), 1);
+
+	auto map_copy = map;
+	EXPECT_EQ(map, map_copy);
+
+	map_copy.set(dummy, 1);
+	EXPECT_NE(map, map_copy);
+
+	EXPECT_THROW(map.get(dummy_copy), std::out_of_range);
+}
+
+TEST(UnorderedMap, PolymorphicKeyValue)
+{
+	DerivedDummyProperty const dummy_0(0);
+	DerivedDummyProperty const dummy_1(1);
+	DerivedDummyProperty const dummy(5);
+
+	dapr::UnorderedMap<DummyProperty, DummyProperty> map;
+
+	EXPECT_TRUE(map.empty());
+	EXPECT_EQ(map.size(), 0);
+	EXPECT_FALSE(map.contains(dummy_0));
+
+	map.set(dummy_0, dummy);
+
+	EXPECT_FALSE(map.empty());
+	EXPECT_EQ(map.size(), 1);
+	EXPECT_TRUE(map.contains(dummy_0));
+	EXPECT_EQ(map.get(dummy_0), dummy);
+
+	auto dummy_to_move = dummy;
+	map.set(dummy_1, std::move(dummy_to_move));
+
+	EXPECT_EQ(map.size(), 2);
+	EXPECT_TRUE(map.contains(dummy_1));
+	EXPECT_EQ(map.get(dummy_1), dummy);
+
+	auto dummy_copy = dummy;
+	dummy_copy.value = 7;
+	map.set(dummy_0, dummy_copy);
+
+	EXPECT_EQ(map.get(dummy_0), dummy_copy);
+
+	dummy_copy.value = 9;
+	map.set(dummy_1, std::move(dummy_copy));
+
+	EXPECT_EQ(dynamic_cast<DerivedDummyProperty const&>(map.get(dummy_1)).value, 9);
+
+	std::unordered_map<DerivedDummyProperty, DerivedDummyProperty> plain_map_copy;
+	for (auto const& [key, value] : map) {
+		plain_map_copy.emplace(
+		    dynamic_cast<DerivedDummyProperty const&>(key),
+		    dynamic_cast<DerivedDummyProperty const&>(value));
+	}
+	EXPECT_TRUE(plain_map_copy.contains(0));
+	EXPECT_TRUE(plain_map_copy.contains(1));
+	EXPECT_EQ(plain_map_copy.at(0).value, 7);
+	EXPECT_EQ(plain_map_copy.at(1).value, 9);
+
+	map.erase(dummy_1);
+	EXPECT_FALSE(map.contains(dummy_1));
+	EXPECT_EQ(map.size(), 1);
+
+	auto map_copy = map;
+	EXPECT_EQ(map, map_copy);
+
+	map_copy.set(dummy_0, dummy);
+	EXPECT_NE(map, map_copy);
+
+	EXPECT_THROW(map.get(DerivedDummyProperty(3)), std::out_of_range);
+}
+
+TEST(UnorderedMap, NotPolymorphic)
+{
+	dapr::UnorderedMap<int, int> map;
+
+	EXPECT_TRUE(map.empty());
+	EXPECT_EQ(map.size(), 0);
+	EXPECT_FALSE(map.contains(1));
+
+	map.set(1, 0);
+
+	EXPECT_FALSE(map.empty());
+	EXPECT_EQ(map.size(), 1);
+	EXPECT_TRUE(map.contains(1));
+	EXPECT_EQ(map.get(1), 0);
+
+	map.set(7, 1);
+
+	EXPECT_EQ(map.get(7), 1);
+
+	map.erase(7);
+	EXPECT_FALSE(map.contains(7));
+	EXPECT_EQ(map.size(), 1);
+
+	auto map_copy = map;
+	EXPECT_EQ(map, map_copy);
+
+	map_copy.set(1, 1);
+	EXPECT_NE(map, map_copy);
+
+	EXPECT_THROW(map.get(7), std::out_of_range);
 }
