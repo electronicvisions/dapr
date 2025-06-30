@@ -95,6 +95,12 @@ struct PropertyHolder
 	 */
 	bool operator!=(PropertyHolder const& other) const;
 
+	/**
+	 * If the stored type is Hashable, this is forwarded, otherwise the implementation of the
+	 * Backend is used.
+	 */
+	size_t hash() const;
+
 private:
 	Backend<T> m_backend;
 
@@ -109,5 +115,21 @@ template <typename T, template <typename...> typename Backend>
 std::ostream& operator<<(std::ostream& os, PropertyHolder<T, Backend> const& value);
 
 } // namespace dapr
+
+namespace std {
+
+template <typename T>
+struct hash;
+
+template <typename T, template <typename...> typename Backend>
+struct hash<dapr::PropertyHolder<T, Backend>>
+{
+	size_t operator()(dapr::PropertyHolder<T, Backend> const& value) const
+	{
+		return value.hash();
+	}
+};
+
+} // namespace std
 
 #include "dapr/property_holder.tcc"

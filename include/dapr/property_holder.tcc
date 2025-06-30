@@ -1,5 +1,7 @@
 #pragma once
 #include "dapr/property_holder.h"
+
+#include "dapr/hashable.h"
 #include <ostream>
 #include <stdexcept>
 
@@ -66,6 +68,15 @@ T* PropertyHolder<T, Backend>::operator->() const
 		throw std::runtime_error("Trying to dereference unset property holder.");
 	}
 	return m_backend.operator->();
+}
+
+template <typename T, template <typename...> typename Backend>
+size_t PropertyHolder<T, Backend>::hash() const
+{
+	if constexpr (std::is_base_of_v<Hashable, T>) {
+		return std::hash<Hashable>{}(*m_backend);
+	}
+	return std::hash<Backend<T>>{}(m_backend);
 }
 
 template <typename T, template <typename...> typename Backend>
