@@ -1,0 +1,8 @@
+@Library("jenlib") _
+
+withCcache() {
+	wafDefaultPipeline(projects: ["dapr"],
+	                   container: [app: "dls-core"],
+	                   configureInstallOptions: "--build-profile=ci",
+	                   notificationChannel: "#dls-software")
+}
