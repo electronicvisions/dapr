@@ -78,6 +78,9 @@ struct GENPYBIND(visible) Map
 	 */
 	bool empty() const;
 
+	void merge(Map& other);
+	void merge(Map&& other) GENPYBIND(hidden);
+
 	typedef boost::transform_iterator<
 	    typename detail::MapTransform<Key, Value>,
 	    typename Backend::const_iterator>

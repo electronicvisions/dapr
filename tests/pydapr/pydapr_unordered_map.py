@@ -40,6 +40,13 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         with self.assertRaises(IndexError):
             dummy_map.get(3)
 
+        dummy_map_copy = pydapr.DummyUnorderedMapParent.PolymorphicValue(
+            dummy_map)
+        dummy_map_merge = pydapr.DummyUnorderedMapParent.PolymorphicValue()
+        dummy_map_merge.merge(dummy_map)
+        self.assertTrue(dummy_map.empty())
+        self.assertEqual(dummy_map_merge, dummy_map_copy)
+
     def test_polymorphic_key(self):
         dummy = pydapr.DerivedDummyProperty(5)
 
@@ -75,6 +82,13 @@ class UnorderedMapTestPydapr(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             dummy_map.get(dummy_copy)
+
+        dummy_map_copy = pydapr.DummyUnorderedMapParent.PolymorphicKey(
+            dummy_map)
+        dummy_map_merge = pydapr.DummyUnorderedMapParent.PolymorphicKey()
+        dummy_map_merge.merge(dummy_map)
+        self.assertTrue(dummy_map.empty())
+        self.assertEqual(dummy_map_merge, dummy_map_copy)
 
     def test_polymorphic_key_value(self):
         dummy = pydapr.DerivedDummyProperty(5)
@@ -112,6 +126,13 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         with self.assertRaises(IndexError):
             dummy_map.get(dummy_copy)
 
+        dummy_map_copy = pydapr.DummyUnorderedMapParent.PolymorphicKeyValue(
+            dummy_map)
+        dummy_map_merge = pydapr.DummyUnorderedMapParent.PolymorphicKeyValue()
+        dummy_map_merge.merge(dummy_map)
+        self.assertTrue(dummy_map.empty())
+        self.assertEqual(dummy_map_merge, dummy_map_copy)
+
     def test_not_polymorphic(self):
         dummy_map = pydapr.DummyUnorderedMapParent.NotPolymorphic()
 
@@ -143,6 +164,13 @@ class UnorderedMapTestPydapr(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             dummy_map.get(3)
+
+        dummy_map_copy = pydapr.DummyUnorderedMapParent.NotPolymorphic(
+            dummy_map)
+        dummy_map_merge = pydapr.DummyUnorderedMapParent.NotPolymorphic()
+        dummy_map_merge.merge(dummy_map)
+        self.assertTrue(dummy_map.empty())
+        self.assertEqual(dummy_map_merge, dummy_map_copy)
 
 
 if __name__ == "__main__":

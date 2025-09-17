@@ -119,6 +119,21 @@ TEST(UnorderedMap, PolymorphicValue)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(3), std::out_of_range);
+
+	dapr::UnorderedMap<int, DummyProperty> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::UnorderedMap<int, DummyProperty> overlapping_map;
+	overlapping_map.set(0, dummy);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	dummy_copy.value = 7;
+	EXPECT_EQ(map.get(0), dummy_copy);
+	EXPECT_EQ(overlapping_map.get(0), dummy);
 }
 
 TEST(UnorderedMap, PolymorphicKey)
@@ -155,6 +170,20 @@ TEST(UnorderedMap, PolymorphicKey)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(dummy_copy), std::out_of_range);
+
+	dapr::UnorderedMap<DummyProperty, int> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::UnorderedMap<DummyProperty, int> overlapping_map;
+	overlapping_map.set(dummy, 1);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	EXPECT_EQ(map.get(dummy), 0);
+	EXPECT_EQ(overlapping_map.get(dummy), 1);
 }
 
 TEST(UnorderedMap, PolymorphicKeyValue)
@@ -216,6 +245,21 @@ TEST(UnorderedMap, PolymorphicKeyValue)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(DerivedDummyProperty(3)), std::out_of_range);
+
+	dapr::UnorderedMap<DummyProperty, DummyProperty> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::UnorderedMap<DummyProperty, DummyProperty> overlapping_map;
+	overlapping_map.set(dummy_0, dummy);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	dummy_copy.value = 7;
+	EXPECT_EQ(map.get(dummy_0), dummy_copy);
+	EXPECT_EQ(overlapping_map.get(dummy_0), dummy);
 }
 
 TEST(UnorderedMap, NotPolymorphic)
@@ -248,4 +292,18 @@ TEST(UnorderedMap, NotPolymorphic)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(7), std::out_of_range);
+
+	dapr::UnorderedMap<int, int> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::UnorderedMap<int, int> overlapping_map;
+	overlapping_map.set(1, 1);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	EXPECT_EQ(map.get(1), 0);
+	EXPECT_EQ(overlapping_map.get(1), 1);
 }

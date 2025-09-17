@@ -98,6 +98,21 @@ TEST(Map, PolymorphicValue)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(3), std::out_of_range);
+
+	dapr::Map<int, DummyProperty> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::Map<int, DummyProperty> overlapping_map;
+	overlapping_map.set(0, dummy);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	dummy_copy.value = 7;
+	EXPECT_EQ(map.get(0), dummy_copy);
+	EXPECT_EQ(overlapping_map.get(0), dummy);
 }
 
 TEST(Map, NotPolymorphic)
@@ -130,4 +145,18 @@ TEST(Map, NotPolymorphic)
 	EXPECT_NE(map, map_copy);
 
 	EXPECT_THROW(map.get(7), std::out_of_range);
+
+	dapr::Map<int, int> new_map;
+	new_map.merge(map);
+	EXPECT_TRUE(map.empty());
+
+	map.merge(std::move(new_map));
+	EXPECT_TRUE(new_map.empty());
+
+	dapr::Map<int, int> overlapping_map;
+	overlapping_map.set(1, 1);
+	map.merge(overlapping_map);
+	EXPECT_EQ(overlapping_map.size(), 1);
+	EXPECT_EQ(map.get(1), 0);
+	EXPECT_EQ(overlapping_map.get(1), 1);
 }

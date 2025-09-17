@@ -64,6 +64,18 @@ bool UnorderedMap<Key, Value>::empty() const
 }
 
 template <typename Key, typename Value>
+void UnorderedMap<Key, Value>::merge(UnorderedMap& other)
+{
+	return m_values.merge(other.m_values);
+}
+
+template <typename Key, typename Value>
+void UnorderedMap<Key, Value>::merge(UnorderedMap&& other)
+{
+	return m_values.merge(std::move(other.m_values));
+}
+
+template <typename Key, typename Value>
 typename UnorderedMap<Key, Value>::ConstIterator UnorderedMap<Key, Value>::begin() const
 {
 	return ConstIterator(m_values.begin());

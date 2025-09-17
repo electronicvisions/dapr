@@ -65,6 +65,18 @@ bool Map<Key, Value>::empty() const
 }
 
 template <typename Key, typename Value>
+void Map<Key, Value>::merge(Map& other)
+{
+	return m_values.merge(other.m_values);
+}
+
+template <typename Key, typename Value>
+void Map<Key, Value>::merge(Map&& other)
+{
+	return m_values.merge(std::move(other.m_values));
+}
+
+template <typename Key, typename Value>
 typename Map<Key, Value>::ConstIterator Map<Key, Value>::begin() const
 {
 	return ConstIterator(m_values.begin());
