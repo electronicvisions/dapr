@@ -4,6 +4,11 @@
 #include <memory>
 #include <type_traits>
 
+namespace cereal {
+struct access;
+} // namespace cereal
+
+
 namespace dapr {
 
 /**
@@ -109,6 +114,10 @@ private:
 	 * required to be a property.
 	 */
 	static_assert(std::is_base_of_v<Property<T>, T>);
+
+	friend class cereal::access;
+	template <typename Archive>
+	void serialize(Archive& ar, std::uint32_t);
 };
 
 template <typename T, template <typename...> typename Backend>

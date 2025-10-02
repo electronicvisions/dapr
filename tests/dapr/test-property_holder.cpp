@@ -1,17 +1,29 @@
 #include "dapr/property_holder.h"
 
+
+#include <cereal/archives/json.hpp>
+
+#include "cereal/types/dapr/property_holder.h"
 #include "dapr/empty_property.h"
 #include "dapr/hashable.h"
 #include "dapr/property.h"
 #include <memory>
+#include <cereal/types/base_class.hpp>
 #include <gtest/gtest.h>
 
 
-namespace {
+namespace dapr_tests_property_holder {
 
 struct DummyProperty : public dapr::Property<DummyProperty>
 {
 	virtual ~DummyProperty() {}
+
+private:
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive&)
+	{
+	}
 };
 
 
@@ -27,7 +39,7 @@ struct DerivedDummyProperty : public DummyProperty
 {
 	int value;
 
-	DerivedDummyProperty(int value) : DummyProperty(), value(value) {}
+	DerivedDummyProperty(int value = 0) : DummyProperty(), value(value) {}
 
 	virtual std::unique_ptr<DummyProperty> copy() const override
 	{
@@ -48,6 +60,15 @@ protected:
 	virtual bool is_equal_to(DummyProperty const& other) const override
 	{
 		return value == static_cast<DerivedDummyProperty const&>(other).value;
+	}
+
+private:
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive& ar)
+	{
+		ar(cereal::base_class<DummyProperty>(this));
+		ar(value);
 	}
 };
 
@@ -85,8 +106,10 @@ protected:
 	}
 };
 
-} // namespace
+} // namespace dapr_tests_property_holder
 
+
+using namespace dapr_tests_property_holder;
 
 TEST(PropertyHolder, General)
 {
@@ -122,4 +145,30 @@ TEST(PropertyHolder, General)
 	DerivedHashableDummyProperty derived_hashable_dummy_5{5};
 	dapr::PropertyHolder<HashableDummyProperty> hashable_holder_5(derived_hashable_dummy_5);
 	EXPECT_EQ(std::hash<dapr::PropertyHolder<HashableDummyProperty>>{}(hashable_holder_5), 5);
+}
+
+CEREAL_REGISTER_TYPE(dapr_tests_property_holder::DummyProperty)
+CEREAL_REGISTER_TYPE(dapr_tests_property_holder::DerivedDummyProperty)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(
+    dapr_tests_property_holder::DummyProperty, dapr_tests_property_holder::DerivedDummyProperty)
+
+TEST(PropertyHolder, Cerealization)
+{
+	DerivedDummyProperty derived_dummy_5{5};
+	dapr::PropertyHolder<DummyProperty> obj(derived_dummy_5);
+	dapr::PropertyHolder<DummyProperty> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
 }
