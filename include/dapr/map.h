@@ -6,6 +6,11 @@
 #include <map>
 #include <boost/iterator/transform_iterator.hpp>
 
+namespace cereal {
+struct access;
+} // namespace cereal
+
+
 namespace dapr {
 
 /**
@@ -101,6 +106,10 @@ struct GENPYBIND(visible) Map
 
 private:
 	Backend m_values;
+
+	friend class cereal::access;
+	template <typename Archive>
+	void serialize(Archive&, std::uint32_t);
 };
 
 } // namespace dapr

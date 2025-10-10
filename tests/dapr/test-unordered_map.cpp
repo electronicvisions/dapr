@@ -1,17 +1,25 @@
 #include "dapr/unordered_map.h"
 
+#include "cereal/types/dapr/unordered_map.h"
 #include "dapr/hashable.h"
 #include "dapr/property.h"
 #include <memory>
+#include <cereal/archives/json.hpp>
 #include <gtest/gtest.h>
 
-namespace {
+namespace dapr_tests_unordered_map {
 
 struct DummyProperty
     : public dapr::Property<DummyProperty>
     , dapr::Hashable
 {
 	virtual ~DummyProperty() {}
+
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive&)
+	{
+	}
 };
 
 
@@ -46,9 +54,19 @@ struct DerivedDummyProperty : public DummyProperty
 	{
 		return value;
 	}
+
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive& ar)
+	{
+		ar(cereal::base_class<DummyProperty>(this));
+		ar(value);
+	}
 };
 
-} // namespace
+} // namespace dapr_tests_unordered_map
+
+using namespace dapr_tests_unordered_map;
 
 namespace std {
 
@@ -306,4 +324,104 @@ TEST(UnorderedMap, NotPolymorphic)
 	EXPECT_EQ(overlapping_map.size(), 1);
 	EXPECT_EQ(map.get(1), 0);
 	EXPECT_EQ(overlapping_map.get(1), 1);
+}
+
+CEREAL_REGISTER_TYPE(dapr_tests_unordered_map::DummyProperty)
+CEREAL_REGISTER_TYPE(dapr_tests_unordered_map::DerivedDummyProperty)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(
+    dapr_tests_unordered_map::DummyProperty, dapr_tests_unordered_map::DerivedDummyProperty)
+
+TEST(UnorderedMap, PolymorphicValueCerealization)
+{
+	DerivedDummyProperty const dummy(5);
+
+	dapr::UnorderedMap<int, DummyProperty> obj;
+	obj.set(0, dummy);
+
+	dapr::UnorderedMap<int, DummyProperty> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
+}
+
+TEST(UnorderedMap, PolymorphicKeyCerealization)
+{
+	DerivedDummyProperty const dummy(5);
+
+	dapr::UnorderedMap<DummyProperty, int> obj;
+	obj.set(dummy, 1);
+
+	dapr::UnorderedMap<DummyProperty, int> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
+}
+
+TEST(UnorderedMap, PolymorphicKeyValueCerealization)
+{
+	DerivedDummyProperty const dummy_5(5);
+	DerivedDummyProperty const dummy_7(7);
+
+	dapr::UnorderedMap<DummyProperty, DummyProperty> obj;
+	obj.set(dummy_5, dummy_7);
+
+	dapr::UnorderedMap<DummyProperty, DummyProperty> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
+}
+
+TEST(UnorderedMap, NotPolymorphicCerealization)
+{
+	dapr::UnorderedMap<int, int> obj;
+	obj.set(0, 1);
+
+	dapr::UnorderedMap<int, int> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
 }

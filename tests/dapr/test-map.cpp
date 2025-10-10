@@ -1,15 +1,23 @@
 #include "dapr/map.h"
 
+#include "cereal/types/dapr/map.h"
 #include "dapr/property.h"
 #include <memory>
+#include <cereal/archives/json.hpp>
 #include <gtest/gtest.h>
 
 
-namespace {
+namespace dapr_tests_map {
 
 struct DummyProperty : public dapr::Property<DummyProperty>
 {
 	virtual ~DummyProperty() {}
+
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive&)
+	{
+	}
 };
 
 
@@ -17,7 +25,7 @@ struct DerivedDummyProperty : public DummyProperty
 {
 	int value;
 
-	DerivedDummyProperty(int value) : value(value) {}
+	DerivedDummyProperty(int value = 0) : value(value) {}
 
 	virtual std::unique_ptr<DummyProperty> copy() const override
 	{
@@ -38,9 +46,20 @@ struct DerivedDummyProperty : public DummyProperty
 	{
 		return os << "DerivedDummyProperty(" << value << ")";
 	}
+
+private:
+	friend struct cereal::access;
+	template <typename Archive>
+	void serialize(Archive& ar)
+	{
+		ar(cereal::base_class<DummyProperty>(this));
+		ar(value);
+	}
 };
 
-} // namespace
+} // namespace dapr_tests_map
+
+using namespace dapr_tests_map;
 
 
 TEST(Map, PolymorphicValue)
@@ -159,4 +178,55 @@ TEST(Map, NotPolymorphic)
 	EXPECT_EQ(overlapping_map.size(), 1);
 	EXPECT_EQ(map.get(1), 0);
 	EXPECT_EQ(overlapping_map.get(1), 1);
+}
+
+CEREAL_REGISTER_TYPE(dapr_tests_map::DummyProperty)
+CEREAL_REGISTER_TYPE(dapr_tests_map::DerivedDummyProperty)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(
+    dapr_tests_map::DummyProperty, dapr_tests_map::DerivedDummyProperty)
+
+TEST(Map, PolymorphicValueCerealization)
+{
+	DerivedDummyProperty const dummy(5);
+
+	dapr::Map<int, DummyProperty> obj;
+	obj.set(0, dummy);
+
+	dapr::Map<int, DummyProperty> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
+}
+
+TEST(Map, ValueCerealization)
+{
+	dapr::Map<int, int> obj;
+	obj.set(0, 1);
+
+	dapr::Map<int, int> obj2;
+
+	std::ostringstream ostream;
+	{
+		cereal::JSONOutputArchive oa(ostream);
+		oa(obj);
+	}
+
+	std::istringstream istream(ostream.str());
+	{
+		cereal::JSONInputArchive ia(istream);
+		ia(obj2);
+	}
+
+	ASSERT_EQ(obj2, obj);
 }
