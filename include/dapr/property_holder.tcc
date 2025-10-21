@@ -97,7 +97,10 @@ bool PropertyHolder<T, Backend>::operator!=(PropertyHolder const& other) const
 template <typename T, template <typename...> typename Backend>
 std::ostream& operator<<(std::ostream& os, PropertyHolder<T, Backend> const& value)
 {
-	return os << *value;
+	if (value) {
+		os << *value;
+	}
+	return os;
 }
 
 } // namespace dapr
