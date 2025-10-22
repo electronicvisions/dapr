@@ -1,4 +1,5 @@
 #pragma once
+#include "pydapr/dummy_auto_key_map.h"
 #include "pydapr/dummy_map.h"
 #include "pydapr/dummy_property.h"
 #include "pydapr/dummy_unordered_map.h"
