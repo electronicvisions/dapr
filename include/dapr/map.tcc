@@ -5,8 +5,8 @@
 
 namespace dapr {
 
-template <typename Key, typename Value>
-Value const& Map<Key, Value>::get(Key const& key) const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+Value const& Map<Key, Value, HolderT>::get(Key const& key) const
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
@@ -20,8 +20,8 @@ Value const& Map<Key, Value>::get(Key const& key) const
 	}
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::set(Key const& key, Value const& value)
+template <typename Key, typename Value, template <typename...> typename HolderT>
+void Map<Key, Value, HolderT>::set(Key const& key, Value const& value)
 {
 	if (!m_values.contains(key)) {
 		m_values.emplace(key, value);
@@ -30,8 +30,8 @@ void Map<Key, Value>::set(Key const& key, Value const& value)
 	}
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::set(Key const& key, Value&& value)
+template <typename Key, typename Value, template <typename...> typename HolderT>
+void Map<Key, Value, HolderT>::set(Key const& key, Value&& value)
 {
 	if (!m_values.contains(key)) {
 		m_values.emplace(key, std::move(value));
@@ -40,50 +40,50 @@ void Map<Key, Value>::set(Key const& key, Value&& value)
 	}
 }
 
-template <typename Key, typename Value>
-size_t Map<Key, Value>::erase(Key const& key)
+template <typename Key, typename Value, template <typename...> typename HolderT>
+size_t Map<Key, Value, HolderT>::erase(Key const& key)
 {
 	return m_values.erase(key);
 }
 
-template <typename Key, typename Value>
-bool Map<Key, Value>::contains(Key const& key) const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+bool Map<Key, Value, HolderT>::contains(Key const& key) const
 {
 	return m_values.contains(key);
 }
 
-template <typename Key, typename Value>
-size_t Map<Key, Value>::size() const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+size_t Map<Key, Value, HolderT>::size() const
 {
 	return m_values.size();
 }
 
-template <typename Key, typename Value>
-bool Map<Key, Value>::empty() const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+bool Map<Key, Value, HolderT>::empty() const
 {
 	return m_values.empty();
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::merge(Map& other)
+template <typename Key, typename Value, template <typename...> typename HolderT>
+void Map<Key, Value, HolderT>::merge(Map& other)
 {
 	return m_values.merge(other.m_values);
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::merge(Map&& other)
+template <typename Key, typename Value, template <typename...> typename HolderT>
+void Map<Key, Value, HolderT>::merge(Map&& other)
 {
 	return m_values.merge(std::move(other.m_values));
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::begin() const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+typename Map<Key, Value, HolderT>::ConstIterator Map<Key, Value, HolderT>::begin() const
 {
 	return ConstIterator(m_values.begin());
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::end() const
+template <typename Key, typename Value, template <typename...> typename HolderT>
+typename Map<Key, Value, HolderT>::ConstIterator Map<Key, Value, HolderT>::end() const
 {
 	return ConstIterator(m_values.end());
 }

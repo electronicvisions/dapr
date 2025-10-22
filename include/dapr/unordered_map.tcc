@@ -4,8 +4,14 @@
 
 namespace dapr {
 
-template <typename Key, typename Value>
-Value const& UnorderedMap<Key, Value>::get(Key const& key) const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+Value const& UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::get(Key const& key) const
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
@@ -19,8 +25,14 @@ Value const& UnorderedMap<Key, Value>::get(Key const& key) const
 	}
 }
 
-template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::set(Key const& key, Value const& value)
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+void UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::set(Key const& key, Value const& value)
 {
 	if (!m_values.contains(key)) {
 		m_values.emplace(key, value);
@@ -29,8 +41,14 @@ void UnorderedMap<Key, Value>::set(Key const& key, Value const& value)
 	}
 }
 
-template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::set(Key const& key, Value&& value)
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+void UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::set(Key const& key, Value&& value)
 {
 	if (!m_values.contains(key)) {
 		m_values.emplace(key, std::move(value));
@@ -39,50 +57,100 @@ void UnorderedMap<Key, Value>::set(Key const& key, Value&& value)
 	}
 }
 
-template <typename Key, typename Value>
-size_t UnorderedMap<Key, Value>::erase(Key const& key)
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+size_t UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::erase(Key const& key)
 {
 	return m_values.erase(key);
 }
 
-template <typename Key, typename Value>
-bool UnorderedMap<Key, Value>::contains(Key const& key) const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+bool UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::contains(Key const& key) const
 {
 	return m_values.contains(key);
 }
 
-template <typename Key, typename Value>
-size_t UnorderedMap<Key, Value>::size() const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+size_t UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::size() const
 {
 	return m_values.size();
 }
 
-template <typename Key, typename Value>
-bool UnorderedMap<Key, Value>::empty() const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+bool UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::empty() const
 {
 	return m_values.empty();
 }
 
-template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::merge(UnorderedMap& other)
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+void UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::merge(UnorderedMap& other)
 {
 	return m_values.merge(other.m_values);
 }
 
-template <typename Key, typename Value>
-void UnorderedMap<Key, Value>::merge(UnorderedMap&& other)
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+void UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::merge(UnorderedMap&& other)
 {
 	return m_values.merge(std::move(other.m_values));
 }
 
-template <typename Key, typename Value>
-typename UnorderedMap<Key, Value>::ConstIterator UnorderedMap<Key, Value>::begin() const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+typename UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::ConstIterator
+UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::begin() const
 {
 	return ConstIterator(m_values.begin());
 }
 
-template <typename Key, typename Value>
-typename UnorderedMap<Key, Value>::ConstIterator UnorderedMap<Key, Value>::end() const
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
+typename UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::ConstIterator
+UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::end() const
 {
 	return ConstIterator(m_values.end());
 }

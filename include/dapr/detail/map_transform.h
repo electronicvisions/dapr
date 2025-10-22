@@ -5,14 +5,15 @@
 
 namespace dapr::detail {
 
-template <typename Key, typename Value>
+template <typename Key, typename Value, template <typename...> typename ValueHolder>
 struct MapTransform
 {
 	template <typename U>
 	constexpr std::pair<Key const&, Value const&> operator()(U&& value) const
 	{
 		if constexpr (std::is_same_v<
-		                  typename std::decay_t<U>::second_type, PropertyHolder<Value>>) {
+		                  typename std::decay_t<U>::second_type,
+		                  PropertyHolder<Value, ValueHolder>>) {
 			return std::pair<Key const&, Value const&>{value.first, *value.second};
 		} else {
 			return std::pair<Key const&, Value const&>{value.first, value.second};

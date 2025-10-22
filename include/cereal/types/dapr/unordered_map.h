@@ -6,9 +6,15 @@
 
 namespace dapr {
 
-template <typename KeyT, typename ValueT>
+template <
+    typename KeyT,
+    typename ValueT,
+    template <typename...>
+    typename KeyHolderT,
+    template <typename...>
+    typename ValueHolderT>
 template <typename Archive>
-void UnorderedMap<KeyT, ValueT>::serialize(Archive& ar, std::uint32_t)
+void UnorderedMap<KeyT, ValueT, KeyHolderT, ValueHolderT>::serialize(Archive& ar, std::uint32_t)
 {
 	ar(m_values);
 }

@@ -22,8 +22,14 @@ namespace dapr {
  * @tparam KeyT Key type, which if polymorphic is required to be derived from a Property and
  * Hashable
  * @tparam ValueT Value type, which if polymorphic is required to be derived from a Property
+ * @tparam KeyHolderT Holder type used in PropertyHolder for key
+ * @tparam ValueHolderT Holder type used in PropertyHolder for value
  */
-template <typename KeyT, typename ValueT>
+template <
+    typename KeyT,
+    typename ValueT,
+    template <typename...> typename ValueHolderT = std::unique_ptr,
+    template <typename...> typename KeyHolderT = std::unique_ptr>
 struct GENPYBIND(visible) UnorderedMap
 {
 	typedef KeyT Key;
@@ -31,9 +37,12 @@ struct GENPYBIND(visible) UnorderedMap
 	typedef std::unordered_map<
 	    std::conditional_t<
 	        std::is_base_of_v<Property<Key>, Key> && std::is_base_of_v<Hashable, Key>,
-	        PropertyHolder<Key>,
+	        PropertyHolder<Key, KeyHolderT>,
 	        Key>,
-	    std::conditional_t<std::is_base_of_v<Property<Value>, Value>, PropertyHolder<Value>, Value>>
+	    std::conditional_t<
+	        std::is_base_of_v<Property<Value>, Value>,
+	        PropertyHolder<Value, ValueHolderT>,
+	        Value>>
 	    Backend;
 
 	UnorderedMap() = default;
@@ -95,7 +104,7 @@ struct GENPYBIND(visible) UnorderedMap
 	void merge(UnorderedMap&& other) GENPYBIND(hidden);
 
 	typedef boost::transform_iterator<
-	    typename detail::UnorderedMapTransform<Key, Value>,
+	    typename detail::UnorderedMapTransform<Key, Value, ValueHolderT, KeyHolderT>,
 	    typename Backend::const_iterator>
 	    ConstIterator;
 

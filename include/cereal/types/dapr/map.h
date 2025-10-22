@@ -6,9 +6,9 @@
 
 namespace dapr {
 
-template <typename KeyT, typename ValueT>
+template <typename KeyT, typename ValueT, template <typename...> typename HolderT>
 template <typename Archive>
-void Map<KeyT, ValueT>::serialize(Archive& ar, std::uint32_t)
+void Map<KeyT, ValueT, HolderT>::serialize(Archive& ar, std::uint32_t)
 {
 	ar(m_values);
 }

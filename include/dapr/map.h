@@ -4,6 +4,7 @@
 #include "dapr/property.h"
 #include "dapr/property_holder.h"
 #include <map>
+#include <memory>
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace cereal {
@@ -17,15 +18,19 @@ namespace dapr {
  * Map storing potentially polymorphic values.
  * @tparam KeyT Key type
  * @tparam ValueT Value type required to be derived from a Property
+ * @tparam HolderT Holder type used in PropertyHolder
  */
-template <typename KeyT, typename ValueT>
+template <typename KeyT, typename ValueT, template <typename...> typename HolderT = std::unique_ptr>
 struct GENPYBIND(visible) Map
 {
 	typedef KeyT Key;
 	typedef ValueT Value;
 	typedef std::map<
 	    Key,
-	    std::conditional_t<std::is_base_of_v<Property<Value>, Value>, PropertyHolder<Value>, Value>>
+	    std::conditional_t<
+	        std::is_base_of_v<Property<Value>, Value>,
+	        PropertyHolder<Value, HolderT>,
+	        Value>>
 	    Backend;
 
 	Map() = default;
@@ -87,7 +92,7 @@ struct GENPYBIND(visible) Map
 	void merge(Map&& other) GENPYBIND(hidden);
 
 	typedef boost::transform_iterator<
-	    typename detail::MapTransform<Key, Value>,
+	    typename detail::MapTransform<Key, Value, HolderT>,
 	    typename Backend::const_iterator>
 	    ConstIterator;
 
