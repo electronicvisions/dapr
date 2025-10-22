@@ -103,6 +103,8 @@ struct GENPYBIND(visible) UnorderedMap
 	void merge(UnorderedMap& other);
 	void merge(UnorderedMap&& other) GENPYBIND(hidden);
 
+	void clear();
+
 	typedef boost::transform_iterator<
 	    typename detail::UnorderedMapTransform<Key, Value, ValueHolderT, KeyHolderT>,
 	    typename Backend::const_iterator>

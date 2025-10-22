@@ -136,6 +136,18 @@ template <
     typename ValueHolderT,
     template <typename...>
     typename KeyHolderT>
+void UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::clear()
+{
+	return m_values.clear();
+}
+
+template <
+    typename Key,
+    typename Value,
+    template <typename...>
+    typename ValueHolderT,
+    template <typename...>
+    typename KeyHolderT>
 typename UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::ConstIterator
 UnorderedMap<Key, Value, ValueHolderT, KeyHolderT>::begin() const
 {

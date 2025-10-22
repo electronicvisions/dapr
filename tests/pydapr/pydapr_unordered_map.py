@@ -47,6 +47,9 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
 
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
+
     def test_polymorphic_key(self):
         dummy = pydapr.DerivedDummyProperty(5)
 
@@ -89,6 +92,9 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         dummy_map_merge.merge(dummy_map)
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
+
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
 
     def test_polymorphic_key_value(self):
         dummy = pydapr.DerivedDummyProperty(5)
@@ -133,6 +139,9 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
 
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
+
     def test_not_polymorphic(self):
         dummy_map = pydapr.DummyUnorderedMapParent.NotPolymorphic()
 
@@ -171,6 +180,9 @@ class UnorderedMapTestPydapr(unittest.TestCase):
         dummy_map_merge.merge(dummy_map)
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
+
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
 
 
 if __name__ == "__main__":

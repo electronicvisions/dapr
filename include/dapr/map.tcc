@@ -77,6 +77,12 @@ void Map<Key, Value, HolderT>::merge(Map&& other)
 }
 
 template <typename Key, typename Value, template <typename...> typename HolderT>
+void Map<Key, Value, HolderT>::clear()
+{
+	return m_values.clear();
+}
+
+template <typename Key, typename Value, template <typename...> typename HolderT>
 typename Map<Key, Value, HolderT>::ConstIterator Map<Key, Value, HolderT>::begin() const
 {
 	return ConstIterator(m_values.begin());

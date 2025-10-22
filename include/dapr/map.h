@@ -91,6 +91,8 @@ struct GENPYBIND(visible) Map
 	void merge(Map& other);
 	void merge(Map&& other) GENPYBIND(hidden);
 
+	void clear();
+
 	typedef boost::transform_iterator<
 	    typename detail::MapTransform<Key, Value, HolderT>,
 	    typename Backend::const_iterator>

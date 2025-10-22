@@ -132,6 +132,9 @@ TEST(Map, PolymorphicValue)
 	dummy_copy.value = 7;
 	EXPECT_EQ(map.get(0), dummy_copy);
 	EXPECT_EQ(overlapping_map.get(0), dummy);
+
+	map.clear();
+	EXPECT_TRUE(map.empty());
 }
 
 TEST(Map, NotPolymorphic)
@@ -178,6 +181,9 @@ TEST(Map, NotPolymorphic)
 	EXPECT_EQ(overlapping_map.size(), 1);
 	EXPECT_EQ(map.get(1), 0);
 	EXPECT_EQ(overlapping_map.get(1), 1);
+
+	map.clear();
+	EXPECT_TRUE(map.empty());
 }
 
 CEREAL_REGISTER_TYPE(dapr_tests_map::DummyProperty)

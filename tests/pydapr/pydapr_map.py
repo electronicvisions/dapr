@@ -47,6 +47,9 @@ class MapTestPydapr(unittest.TestCase):
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
 
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
+
     def test_not_polymorphic(self):
         dummy_map = pydapr.DummyMapParent.NotPolymorphic()
 
@@ -85,6 +88,9 @@ class MapTestPydapr(unittest.TestCase):
         dummy_map_merge.merge(dummy_map)
         self.assertTrue(dummy_map.empty())
         self.assertEqual(dummy_map_merge, dummy_map_copy)
+
+        dummy_map_merge.clear()
+        self.assertTrue(dummy_map_merge.empty())
 
 
 if __name__ == "__main__":
