@@ -28,3 +28,5 @@ private:
 };
 
 } // namespace dapr
+
+#include "dapr/empty_property.tcc"

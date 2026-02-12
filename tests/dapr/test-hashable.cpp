@@ -1,7 +1,6 @@
 #include "dapr/hashable.h"
 
 #include "dapr/empty_property.h"
-#include "dapr/empty_property_impl.tcc"
 #include "dapr/property.h"
 #include "dapr/property_holder.h"
 #include <gtest/gtest.h>

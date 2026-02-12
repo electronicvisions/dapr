@@ -1,7 +1,5 @@
 #include "dapr/empty_property.h"
 
-#include "dapr/empty_property_impl.tcc"
-
 #include <vector>
 #include <gtest/gtest.h>
 
