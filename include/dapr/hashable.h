@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <functional>
 
 namespace dapr {
 
@@ -11,9 +12,6 @@ struct Hashable
 } // namespace dapr
 
 namespace std {
-
-template <typename T>
-struct hash;
 
 template <>
 struct hash<dapr::Hashable>

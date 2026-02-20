@@ -1,5 +1,6 @@
 #pragma once
 #include "dapr/property.h"
+#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <type_traits>
@@ -126,9 +127,6 @@ std::ostream& operator<<(std::ostream& os, PropertyHolder<T, Backend> const& val
 } // namespace dapr
 
 namespace std {
-
-template <typename T>
-struct hash;
 
 template <typename T, template <typename...> typename Backend>
 struct hash<dapr::PropertyHolder<T, Backend>>
