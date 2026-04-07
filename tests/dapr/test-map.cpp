@@ -236,3 +236,19 @@ TEST(Map, ValueCerealization)
 
 	ASSERT_EQ(obj2, obj);
 }
+
+TEST(Map, Get)
+{
+	dapr::Map<size_t, size_t> map;
+	map.set(0, 1);
+
+	auto get_from_const_map = [](auto const& map) {
+		static_assert(std::is_const_v<std::remove_reference_t<decltype(map.get(0))>>);
+	};
+	get_from_const_map(map);
+
+	auto get_from_non_const_map = [](auto& map) {
+		static_assert(!std::is_const_v<std::remove_reference_t<decltype(map.get(0))>>);
+	};
+	get_from_non_const_map(map);
+}

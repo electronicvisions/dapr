@@ -212,3 +212,19 @@ TEST(AutoKeyMap, ValueCerealization)
 
 	ASSERT_EQ(obj2, obj);
 }
+
+TEST(AutoKeyMap, Get)
+{
+	dapr::AutoKeyMap<size_t, size_t> map;
+	auto key = map.insert(0);
+
+	auto get_from_const_map = [key](auto const& map) {
+		static_assert(std::is_const_v<std::remove_reference_t<decltype(map.get(key))>>);
+	};
+	get_from_const_map(map);
+
+	auto get_from_non_const_map = [key](auto& map) {
+		static_assert(!std::is_const_v<std::remove_reference_t<decltype(map.get(key))>>);
+	};
+	get_from_non_const_map(map);
+}

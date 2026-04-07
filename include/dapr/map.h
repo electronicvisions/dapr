@@ -41,6 +41,14 @@ struct GENPYBIND(visible) Map
 	 * @return Value to get
 	 * @throws std::out_of_range On no element for key present in map
 	 */
+	Value& get(Key const& key) GENPYBIND(hidden);
+
+	/**
+	 * Get value of element present in map.
+	 * @param key Key for which to get value
+	 * @return Value to get
+	 * @throws std::out_of_range On no element for key present in map
+	 */
 	Value const& get(Key const& key) const GENPYBIND(hidden);
 
 	GENPYBIND_MANUAL({

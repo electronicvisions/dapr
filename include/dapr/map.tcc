@@ -6,6 +6,21 @@
 namespace dapr {
 
 template <typename Key, typename Value, template <typename...> typename HolderT>
+Value& Map<Key, Value, HolderT>::get(Key const& key)
+{
+	if (!m_values.contains(key)) {
+		std::stringstream ss;
+		ss << "Map doesn't contain entry for key " << key << ".";
+		throw std::out_of_range(ss.str());
+	}
+	if constexpr (std::is_base_of_v<Property<Value>, Value>) {
+		return *m_values.at(key);
+	} else {
+		return m_values.at(key);
+	}
+}
+
+template <typename Key, typename Value, template <typename...> typename HolderT>
 Value const& Map<Key, Value, HolderT>::get(Key const& key) const
 {
 	if (!m_values.contains(key)) {

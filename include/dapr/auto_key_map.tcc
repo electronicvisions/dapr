@@ -31,6 +31,12 @@ Key AutoKeyMap<Key, Value, Backend>::insert(Value&& value)
 }
 
 template <typename Key, typename Value, typename Backend>
+Value& AutoKeyMap<Key, Value, Backend>::get(Key const& key)
+{
+	return m_values.get(key);
+}
+
+template <typename Key, typename Value, typename Backend>
 Value const& AutoKeyMap<Key, Value, Backend>::get(Key const& key) const
 {
 	return m_values.get(key);
