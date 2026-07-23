@@ -224,7 +224,7 @@ TEST(AutoKeyMap, Get)
 	get_from_const_map(map);
 
 	auto get_from_non_const_map = [key](auto& map) {
-		static_assert(!std::is_const_v<std::remove_reference_t<decltype(map.get(key))>>);
+		static_assert(!std::is_const_v<std::remove_reference_t<decltype(map.get_mutable(key))>>);
 	};
 	get_from_non_const_map(map);
 }

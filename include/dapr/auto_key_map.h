@@ -33,7 +33,7 @@ struct GENPYBIND(visible) AutoKeyMap
 	 * @throws std::out_of_range If no key could be automatically generated due to the next key
 	 * being out of range of the numerical limits of the key.
 	 */
-	Key insert(Value const& value);
+	virtual Key insert(Value const& value);
 
 	/**
 	 * Insert new value.
@@ -42,7 +42,7 @@ struct GENPYBIND(visible) AutoKeyMap
 	 * @throws std::out_of_range If no key could be automatically generated due to the next key
 	 * being out of range of the numerical limits of the key.
 	 */
-	Key insert(Value&& value) GENPYBIND(hidden);
+	virtual Key insert(Value&& value) GENPYBIND(hidden);
 
 	/**
 	 * Get value of element present in map.
@@ -50,7 +50,7 @@ struct GENPYBIND(visible) AutoKeyMap
 	 * @return Value to get
 	 * @throws std::out_of_range On no element for key present in map
 	 */
-	Value& get(Key const& key) GENPYBIND(hidden);
+	Value& get_mutable(Key const& key) GENPYBIND(hidden);
 
 	/**
 	 * Get value of element present in map.
@@ -75,7 +75,7 @@ struct GENPYBIND(visible) AutoKeyMap
 	 * @param value Value to get
 	 * @throws std::out_of_range If no value to given key is stored
 	 */
-	void set(Key const& key, Value const& value);
+	virtual void set(Key const& key, Value const& value);
 
 	/**
 	 * Setet value of element in map.
@@ -83,7 +83,7 @@ struct GENPYBIND(visible) AutoKeyMap
 	 * @param value Value to get
 	 * @throws std::out_of_range If no value to given key is stored
 	 */
-	void set(Key const& key, Value&& value) GENPYBIND(hidden);
+	virtual void set(Key const& key, Value&& value) GENPYBIND(hidden);
 
 	/**
 	 * Erase element for given key in map.
