@@ -47,7 +47,11 @@ void AutoKeyMap<Key, Value, Backend>::set(Key const& key, Value const& value)
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
-		ss << "AutoKeyMap doesn't contain entry for key " << key << ".";
+		ss << "AutoKeyMap missing entry";
+		if constexpr (requires { ss << key; }) {
+			ss << " for key " << key;
+		}
+		ss << ".";
 		throw std::out_of_range(ss.str());
 	}
 	return m_values.set(key, value);
@@ -58,7 +62,11 @@ void AutoKeyMap<Key, Value, Backend>::set(Key const& key, Value&& value)
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
-		ss << "AutoKeyMap doesn't contain entry for key " << key << ".";
+		ss << "AutoKeyMap missing entry";
+		if constexpr (requires { ss << key; }) {
+			ss << " for key " << key;
+		}
+		ss << ".";
 		throw std::out_of_range(ss.str());
 	}
 	m_values.set(key, std::move(value));

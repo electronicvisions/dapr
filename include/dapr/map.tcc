@@ -10,7 +10,11 @@ Value& Map<Key, Value, HolderT>::get(Key const& key)
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
-		ss << "Map doesn't contain entry for key " << key << ".";
+		ss << "Map missing entry";
+		if constexpr (requires { ss << key; }) {
+			ss << " for key " << key;
+		}
+		ss << ".";
 		throw std::out_of_range(ss.str());
 	}
 	if constexpr (std::is_base_of_v<Property<Value>, Value>) {
@@ -25,7 +29,11 @@ Value const& Map<Key, Value, HolderT>::get(Key const& key) const
 {
 	if (!m_values.contains(key)) {
 		std::stringstream ss;
-		ss << "Map doesn't contain entry for key " << key << ".";
+		ss << "Map missing entry";
+		if constexpr (requires { ss << key; }) {
+			ss << " for key " << key;
+		}
+		ss << ".";
 		throw std::out_of_range(ss.str());
 	}
 	if constexpr (std::is_base_of_v<Property<Value>, Value>) {

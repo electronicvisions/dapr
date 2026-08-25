@@ -64,6 +64,12 @@ struct DerivedDummyProperty : public DummyProperty
 	}
 };
 
+struct NonStreamableKey
+{
+	int value;
+	bool operator==(NonStreamableKey const&) const = default;
+};
+
 } // namespace dapr_tests_unordered_map
 
 using namespace dapr_tests_unordered_map;
@@ -76,6 +82,15 @@ struct hash<DerivedDummyProperty>
 	size_t operator()(DerivedDummyProperty const& value) const
 	{
 		return value.hash();
+	}
+};
+
+template <>
+struct hash<NonStreamableKey>
+{
+	size_t operator()(NonStreamableKey const& key) const
+	{
+		return std::hash<int>{}(key.value);
 	}
 };
 
@@ -436,4 +451,12 @@ TEST(UnorderedMap, NotPolymorphicCerealization)
 	}
 
 	ASSERT_EQ(obj2, obj);
+}
+
+TEST(UnorderedMap, NonStreamableKey)
+{
+	dapr::UnorderedMap<NonStreamableKey, int> map;
+	map.set(NonStreamableKey{1}, 42);
+	EXPECT_EQ(map.get(NonStreamableKey{1}), 42);
+	EXPECT_THROW(map.get(NonStreamableKey{9}), std::out_of_range);
 }

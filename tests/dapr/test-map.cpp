@@ -3,6 +3,7 @@
 #include "cereal/types/dapr/map.h"
 #include "dapr/property.h"
 #include <memory>
+#include <vector>
 #include <cereal/archives/json.hpp>
 #include <gtest/gtest.h>
 
@@ -251,4 +252,12 @@ TEST(Map, Get)
 		static_assert(!std::is_const_v<std::remove_reference_t<decltype(map.get(0))>>);
 	};
 	get_from_non_const_map(map);
+}
+
+TEST(Map, NonStreamableKey)
+{
+	dapr::Map<std::vector<int>, int> map;
+	map.set({1, 2}, 42);
+	EXPECT_EQ(map.get({1, 2}), 42);
+	EXPECT_THROW(map.get({9, 9}), std::out_of_range);
 }
